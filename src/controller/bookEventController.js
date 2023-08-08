@@ -68,9 +68,17 @@ const attendEvent = async (req, res) => {
             return res.status(400).json({ error: 'Your are not allowed to attend.' });
         }
         // Update the status of the attendee
+        const currentTime = new Date();
+
+        // Update the status of the attendee along with the attendance time
         await Event.updateOne(
             { _id: eventId, "attendees._id": attendeeId },
-            { $set: { "attendees.$.attendancestatus": true } }
+            { 
+                $set: { 
+                    "attendees.$.attendancestatus": true,
+                    "attendees.$.attendanceTime": new Date(currentTime).toLocaleString()
+                } 
+            }
         );
 
         return res.status(200).json({ message: 'Attendance updated successfully.' });
@@ -178,6 +186,68 @@ const paymentInfo = async (req, res) => {
           
 
     }
+    const getEventBookieInfo = async (req, res) => {
+        try {
+            const eventId = req.body.eventId;  // ID of the event    
+    
+            // Find the event using the eventId
+            const eventDetail = await Event.findOne({ _id: eventId });
+    
+            if (!eventDetail || !eventDetail.attendees) {
+                return res.status(404).json({ error: 'Event or attendees not found' });
+            }
+    
+            // Get all attendee IDs
+            const attendeeIds = eventDetail.attendees.map(attendee => attendee._id.toString());
+    
+            // Find all bookings for these attendees
+            const allBookingDetails = await BookEvents.find({
+                "bookings": {
+                    $elemMatch: {
+                        "_id": { $in: attendeeIds },
+                        "eventId": eventId
+                    }
+                }
+            });
+            console.log(allBookingDetails,"details")
+    
+            let results = [];
+            
+            for (const attendee of eventDetail.attendees) {
+                const attendeeId = attendee._id.toString();
+                
+                const bookingDetail = allBookingDetails.find(bookingDoc => 
+                    bookingDoc.bookings.some(booking => booking._id.toString() === attendeeId)
+                );
+                
+                if (bookingDetail) {
+                    const attendeeBooking = bookingDetail.bookings.find(booking => booking._id.toString() === attendeeId);
+                    //  console.log(bookingDetail.createdAt)
+                    const createdAt = new Date(bookingDetail.createdAt).toLocaleString();
+                    
 
-module.exports = { bookEvent, attendEvent, paymentInfo, getBookieInfo,getAllBookEvents };
+                    results.push({
+                        // eventId: eventId,
+                        eventName: attendeeBooking.eventName,
+                        name: attendeeBooking.name,
+                        email: attendeeBooking.email,
+                        mobNumber: attendeeBooking.mobNumber,
+                        // nicNumber: attendeeBooking.nicNumber,
+                        attendancestatus: attendee.attendancestatus,
+                        attendancetime:attendee.attendanceTime,
+                        paymentStatus: attendee.paymentStatus,
+                        createdAt: createdAt,
+                    });
+                }
+            }
+    
+            return res.status(200).json(results);
+    
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred while retrieving bookings.' });
+        }
+    };
+    
+    
+module.exports = { bookEvent, attendEvent, paymentInfo, getBookieInfo,getAllBookEvents,getEventBookieInfo };
 

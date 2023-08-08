@@ -1,17 +1,3 @@
-// const mongoose=require('mongoose')
-
-// const Schema = mongoose.Schema
-// const NumberOTPVerificationSchema=new Schema({
-//     userId:String,
-//     otp:String,
-//     createdAt:Date,
-//     expiresAt:Date
-
-// })
-
-// const NumberOTPVerification=mongoose.model('otp', NumberOTPVerificationSchema)
-
-// module.exports=NumberOTPVerification
 
 const mongoose = require('mongoose');
 

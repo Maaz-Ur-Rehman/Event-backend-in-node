@@ -59,10 +59,15 @@ const eventSchema = new Schema({
             type: Boolean,
             default: false
         },
+
         paymentStatus: {
             type: Boolean,
             default: false
+        },
+        attendanceTime:{
+            type:String
         }
+
     }],
     // attendees: [{
     //     type: Schema.Types.ObjectId,

@@ -3,7 +3,7 @@ const {protect} = require('../middleware/requireAuth')
 const router = express.Router();
 const { loginUser, signupUser, getAllUsers } = require('../controller/userController');
 const { createEvent, getEvents, getEventsAdmin, getOwnerEvents, updateEvent, deleteEvent } = require('../controller/eventController');
-const {bookEvent, getBookieInfo, attendEvent, paymentInfo, getAllBookEvents} = require('../controller/bookEventController');
+const {bookEvent, getBookieInfo, attendEvent, paymentInfo, getAllBookEvents, getEventBookieInfo} = require('../controller/bookEventController');
 const {sendMail} = require('../controller/emailController');
 const GetOTPVerificationEmail = require('../controller/emailOTPController');
 const { sendOTP, sendOTPNo, verifyOTPNo } = require('../controller/sendOTPController');
@@ -25,7 +25,7 @@ router.post('/paymentInfo', paymentInfo)
 router.post('/getBookieInfo', getBookieInfo);
 router.post('/sendMail', sendMail);
 router.get('/getallbookevents/:id',getAllBookEvents)
-
+router.post('/getEventBookieInfo', getEventBookieInfo);
 // ==========OTP==================
 // router.post('/getOTP',GetOTPVerificationEmail)
 // router.post('/sendOTP',SendOTPVerificationEmail)
